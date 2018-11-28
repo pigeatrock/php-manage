@@ -24,7 +24,7 @@ class customer extends Controller
         $customer_type = $_GET['customer_type'];
         $service_type = $_GET['service_type'];
         $fault_info = $_GET['fault_info'];
-        $phone_version = $_GET['phone_version'];
+        $phone_version = $_GET['phone_version'][1];
         $phone_color = $_GET['phone_color'];
         $imei1 = $_GET['imei1'];
         $imei2 = $_GET['imei2'];
@@ -32,12 +32,13 @@ class customer extends Controller
         $repair_result = $_GET['repair_result'];
         $check_result = $_GET['check_result'];
         $actual_fault = $_GET['actual_fault'];
+        $fault_code = $_GET['fault_code'];
         $materiel = $_GET['materiel'];
         $new_imei1 = $_GET['new_imei1'];
         $new_imei2 = $_GET['new_imei2'];
         $end_time = $start_time + 50*60;
 
-        DB::insert('insert into customer(customer_name,phone,uid,customer_type,service_type,fault_info,phone_version,phone_color,imei1,imei2,start_time,repair_result,check_result,actual_fault,materiel,new_imei1,new_imei2,end_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[$customer_name,$phone,$uid,$customer_type,$service_type,$fault_info,$phone_version,$phone_color,$imei1,$imei2,$start_time,$repair_result,$check_result,$actual_fault,$materiel,$new_imei1,$new_imei2,$end_time]);
+        DB::insert('insert into customer(customer_name,phone,uid,customer_type,service_type,fault_info,phone_version,phone_color,imei1,imei2,start_time,repair_result,check_result,actual_fault,fault_code,materiel,new_imei1,new_imei2,end_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[$customer_name,$phone,$uid,$customer_type,$service_type,$fault_info,$phone_version,$phone_color,$imei1,$imei2,$start_time,$repair_result,$check_result,$actual_fault,$fault_code,$materiel,$new_imei1,$new_imei2,$end_time]);
     }
     //查询信息
     public function show()
@@ -45,6 +46,7 @@ class customer extends Controller
         $uid = $_GET['uid'];
         if($uid == 2){
             $data = DB::select('select * from customer order by end_time desc');
+            // $data = DB::table('customer')->leftJoin('fault','customer.fault_code','=','fault.id')->join('materiel','customer.materiel','=','materiel.id')->get();
         }else{
             $data = DB::select('select * from customer where uid = ? order by end_time desc',[$uid]);
         }
@@ -56,7 +58,7 @@ class customer extends Controller
         $info_id = $_GET['info_id'];
         //$data = DB::table('customer')->leftJoin('user','customer.uid','=','user.id')->where('customer.id','=',$info_id)->get();
         //$data = DB::select('select * from customer where id = ?',[$info_id]);
-        $data = DB::table('customer')->leftJoin('user','customer.uid','=','user.id')->where('customer.id','=',"$info_id")->select()->get();
+        $data = DB::table('customer')->leftJoin('user','customer.uid','=','user.id')->join('materiel','customer.materiel','=','materiel.id')->where('customer.id','=',"$info_id")->select()->get();
         return $data;
     }
     //删除

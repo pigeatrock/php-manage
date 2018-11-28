@@ -20,6 +20,18 @@ Route::get('/', function () {
 
 //添加客户信息
 Route::get('save','customer@save');
+//获取故障代码
+Route::any('getfault','fault@show');
+//获得phone version一级菜单
+Route::any('getphoneversion1','phone@show1');
+//获得phone version二级菜单
+Route::any('getphoneversion2','phone@show2');
+//获得手机型号
+Route::any('getphonetype','phone@type');
+//获得materiel的列表
+Route::any('getmateriel','materiel@show');
+//获取物料名称
+Route::any('materielname','materiel@getname');
 //查询信息
 Route::get('show','customer@show');
 //筛选
