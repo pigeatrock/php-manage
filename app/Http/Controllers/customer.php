@@ -24,6 +24,7 @@ class customer extends Controller
         $customer_type = $_GET['customer_type'];
         $service_type = $_GET['service_type'];
         $fault_info = $_GET['fault_info'];
+        $phone_type = $_GET['phone_version'][0];
         $phone_version = $_GET['phone_version'][1];
         $phone_color = $_GET['phone_color'];
         $imei1 = $_GET['imei1'];
@@ -38,7 +39,7 @@ class customer extends Controller
         $new_imei2 = $_GET['new_imei2'];
         $end_time = $start_time + 50*60;
 
-        DB::insert('insert into customer(customer_name,phone,uid,customer_type,service_type,fault_info,phone_version,phone_color,imei1,imei2,start_time,repair_result,check_result,actual_fault,fault_code,materiel,new_imei1,new_imei2,end_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[$customer_name,$phone,$uid,$customer_type,$service_type,$fault_info,$phone_version,$phone_color,$imei1,$imei2,$start_time,$repair_result,$check_result,$actual_fault,$fault_code,$materiel,$new_imei1,$new_imei2,$end_time]);
+        DB::insert('insert into customer(customer_name,phone,uid,customer_type,service_type,fault_info,phone_type,phone_version,phone_color,imei1,imei2,start_time,repair_result,check_result,actual_fault,fault_code,materiel,new_imei1,new_imei2,end_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[$customer_name,$phone,$uid,$customer_type,$service_type,$fault_info,$phone_type,$phone_version,$phone_color,$imei1,$imei2,$start_time,$repair_result,$check_result,$actual_fault,$fault_code,$materiel,$new_imei1,$new_imei2,$end_time]);
     }
     //查询信息
     public function show()
@@ -70,34 +71,32 @@ class customer extends Controller
     //条件查询
     public function query()
     {
-        $time1 = $_GET['time1'];
-        $time2 = $_GET['time2'];
+        $time1 = $_GET['time1']/1000;
+        $time2 = $_GET['time2']/1000;
         $uid = $_GET['uid'];
-        $phone_version = $_GET['phone_version'];
-        if($uid == 2)
+        $phone_type = $_GET['phone_type'];
+
+        $where_str = ' 1=1 ';
+       
+        if($uid != 2)
         {
-            if($phone_version == ''){
-                $data =DB::select('select * from customer where (end_time between ? and ?)',[$time1,$time2]);
-            return $data;
-            }elseif($time2==''){
-                $data =DB::select('select * from customer where  phone_version = ?',[$phone_version]);
-            return $data;
-            }else{
-                $data =DB::select('select * from customer where (end_time between ? and ?) and  phone_version = ?',[$time1,$time2,$phone_version]);
-            return $data;
-            }
-        }else{
-            if($phone_version == ''){
-                $data =DB::select('select * from customer where (end_time between ? and ?) and uid =?',[$time1,$time2,$uid]);
-            return $data;
-            }elseif($time2==''){
-                $data =DB::select('select * from customer where  phone_version = ? and uid =?',[$phone_version,$uid]);
-            return $data;
-            }else{
-                $data =DB::select('select * from customer where (end_time between ? and ?) and  phone_version = ? and uid = ?',[$time1,$time2,$phone_version,$uid]);
-            return $data;
-            }
+        $where_str .= ' and uid=$uid ';
         }
+        if($phone_type!= ''){
+            $where_str .= " and phone_type = '$phone_type'";
+        }
+        if($time1!='' && $time2!=''){
+            $where_str .= " and (end_time between $time1 and $time2)";  
+        }elseif($time1=='' && $time2 ==''){
+        }elseif($time1=='' && $time2 != ''){
+            $where_str .= " and end_time <= $time2";
+        }elseif($time1 !='' && $time2 ==''){
+            $where_str .= " and end_time >= $time1";
+        }
+        // echo $where_str;
+        $data =DB::select("select * from customer where $where_str");
+        return $data;
+
         // if($phone_version == ''){
         //     $data =DB::select('select * from customer where (end_time between ? and ?) and uid =?',[$time1,$time2,$uid]);
         // return $data;

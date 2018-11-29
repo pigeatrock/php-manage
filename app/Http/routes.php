@@ -22,6 +22,8 @@ Route::get('/', function () {
 Route::get('save','customer@save');
 //获取故障代码
 Route::any('getfault','fault@show');
+//获得phone type列表
+Route::any('gettypeoptions','phone@typeoptions');
 //获得phone version一级菜单
 Route::any('getphoneversion1','phone@show1');
 //获得phone version二级菜单

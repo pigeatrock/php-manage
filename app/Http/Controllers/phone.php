@@ -65,6 +65,22 @@ class phone extends Controller
 
         // return ["code"=>20000,"data"=>$fin];
     }*/
+    //获得手机型号列表
+    public function typeoptions()
+    {
+        //取出一级
+        $first = [];
+        $first_tmp = DB::table('phone')->select('phone_type')->distinct()->get();
+        foreach($first_tmp as $tmp)
+        {
+            $first[] = $tmp->phone_type;
+        }
+        foreach($first as $tmp)
+        {
+            $arr[] = ['value'=>$tmp,'label'=>$tmp];
+        }
+        return $arr;
+    }
     public function show1()
     {
         //取出一级
