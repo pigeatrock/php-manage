@@ -94,10 +94,11 @@ class phone extends Controller
 
         foreach($first as $tmp)
         {
-            $arr[] = ['value'=>$tmp,'label'=>$tmp,'phones'=>[]];
+            $arr[] = ['value'=>$tmp,'label'=>$tmp,'children'=>[]];
         }
         // return $arr;
-        return ["code"=>20000,"data"=>$arr];
+        // return ["code"=>20000,"data"=>$arr];
+        return $arr;
     }
     //phone version 二级菜单
     public function show2()
@@ -112,9 +113,54 @@ class phone extends Controller
         // return $fin; ["m6","m6s","m8","m8t","m8s","t8","t8s","v6","t9","t9\u7279\u522b\u7248"]
         foreach($fin as $tmp)
         {
-            $arr[] = ['label'=>$tmp];
+            $arr[] = ['value'=>$tmp,'label'=>$tmp];
         }
-        return ["code"=>20000,"data"=>$arr];
+        return $arr;
+        // return ["code"=>20000,"data"=>$arr];
+        
+    }
+    //获得当前选择的列表
+    public function selectoptions()
+    {
+        $arr_children = [];//当前选中的二级列表
+        $arr = [];//返回数据
+        $id = $_GET['storage_id'];
+        $second1 = DB::select('select * from customer where id =?',[$id]);
+        $second = $second1[0]->phone_type;
+        $second_tmp = DB::select('select phone_version from phone where phone_type = ?',[$second]);
+
+        foreach($second_tmp as $tmp)
+        {
+            $fin[] = $tmp->phone_version;
+        }
+        // return $fin; ["m6","m6s","m8","m8t","m8s","t8","t8s","v6","t9","t9\u7279\u522b\u7248"]
+        foreach($fin as $tmp)
+        {
+            $arr_children[] = ['value'=>$tmp,'label'=>$tmp];
+        }
+
+        //取出一级
+        $first = [];
+        $first_tmp = DB::table('phone')->select('phone_type')->distinct()->get();
+        foreach($first_tmp as $tmp)
+        {
+            $first[] = $tmp->phone_type;
+        }
+        // return $first; ["m6","m6s","m8","m8t","m8s","t8","t8s","v6","t9","t9\u7279\u522b\u7248"]
+
+        foreach($first as $tmp)
+        {
+            if($tmp == $second)
+            {
+                $arr[] = ['value'=>$tmp,'label'=>$tmp,'children'=>$arr_children];
+            }else
+            {
+                $arr[] = ['value'=>$tmp,'label'=>$tmp,'children'=>[]];
+            }
+        }
+        // return $arr;
+        // return ["code"=>20000,"data"=>$arr];
+        return $arr;
     }
     //获得手机型号
     public function type()

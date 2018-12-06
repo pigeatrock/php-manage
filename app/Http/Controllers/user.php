@@ -13,7 +13,11 @@ class user extends Controller
     //测试
     public function test()
     {
-        
+        // $data = DB::select('select * from customer order by end_time desc');
+        // $data = DB::select('select * from customer ');
+        // $data = DB::table('customer')->join('user','customer.uid','=','user.id')->select('customer.*','user.website_name')->get();
+        // return $data;
+        $data = DB::table('');
     }
     //login
     public function login(Request $request)
@@ -51,8 +55,8 @@ class user extends Controller
         ];*/
         if($token)
         {
-            $data = DB::select('select * from user where token = ?',[$token]);
-            return ["code" => 20000,"roles" =>[$data[0]->roles],"name" => $data[0]->name,"id" => $data[0]->id,"website_name" => $data[0]->website_name,"address" => $data[0]->address, "website_phone"=>$data[0]->website_phone, "avatar" => "http://127.0.0.1:88/meitu/public/1.jpg"];
+            $data = DB::select('select *,concat(address_sheng,address_shi) as address from user where token = ?',[$token]);
+            return ["code" => 20000,"roles" =>[$data[0]->roles],"name" => $data[0]->name,"id" => $data[0]->id,"website_name" => $data[0]->website_name,"address_sheng" => $data[0]->address_sheng, "address_shi" => $data[0]->address_shi,"address"=>$data[0]->address,"website_phone"=>$data[0]->website_phone, "avatar" => "/src/assets/avatar.gif"];
         }else{
             return ["code" => 50008];
         }
@@ -61,7 +65,8 @@ class user extends Controller
     //显示账号列表
     public function show()
     {
-        $data = DB::table('user')->whereNotIn('id',[2])->get();
+        // $data = DB::table('user')->whereNotIn('id',[2])->get();
+        $data = DB::select('select *,concat(address_sheng,address_shi) as address from user where id != 2');
         return ["code" => 20000,"data"=>$data];
     }
     //编辑账号
@@ -76,12 +81,13 @@ class user extends Controller
         $name = $edit_info->name;
         $password = $edit_info->password;
         $website_name = $edit_info->website_name;
-        $address = $edit_info->address;
+        $address_sheng = $edit_info->address_sheng;
+        $address_shi = $edit_info->address_shi;
         $website_phone = $edit_info->website_phone;
         // DB::table('user')->where('id',$edit_info.id)
         //     ->update(['name'=>$edit_info.name,'password'=>$edit_info.password,'website_name'=>$edit_info.website_name,'address'=>$edit_info.address,'website_phone'->$edit_info.website_phone]);
         DB::table('user')->where('id','=',$id)->update(
-            ['name'=>$name,'password'=>$password,'website_name'=>$website_name,'address'=>$address,'website_phone'=>$website_phone]);
+            ['name'=>$name,'password'=>$password,'website_name'=>$website_name,'address_sheng'=>$address_sheng,'address_shi'=>$address_shi,'website_phone'=>$website_phone]);
 
         return ["code"=>20000,
                 "message" => "edituser"
@@ -94,7 +100,7 @@ class user extends Controller
         $user_info = json_decode($_GET['user_info']);
         $time = time();
         DB::table('user')->insert(
-            ['website_name'=> $user_info->website_name, 'address'=>$user_info->address,'website_phone'=>$user_info->website_phone,'name'=>$user_info->name,'password'=>$user_info->password,'token'=>$time ]
+            ['website_name'=> $user_info->website_name, 'address_sheng'=>$user_info->address_sheng,'address_shi'=>$user_info->address_shi,'website_phone'=>$user_info->website_phone,'name'=>$user_info->name,'password'=>$user_info->password,'token'=>$time ]
         );
         $data = [
             "code" => 20000,

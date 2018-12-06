@@ -23,5 +23,12 @@ class materiel extends Controller
         $data = DB::table('materiel')->select('materiel_name')->where('id',$id)->get();
         return $data;
     }
+    //获取单个物料名称
+    public function singlename()
+    {
+        $id = $_GET['id'];
+        $data = DB::select('select concat(materiel_code," ",materiel_name) as value from materiel where id =?',[$id]);
+        return $data;
+    }
 
 }
